@@ -1,12 +1,14 @@
 from __future__ import print_function
 import os
 import argparse
+import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 from torchvision import datasets, transforms
 from torch.optim.lr_scheduler import StepLR
+
 
 import time
 
@@ -127,14 +129,38 @@ def main():
     train_loader = torch.utils.data.DataLoader(dataset1,**train_kwargs)
     test_loader = torch.utils.data.DataLoader(dataset2, **test_kwargs)
 
-    model = Net().to(device)
-    optimizer = optim.Adadelta(model.parameters(), lr=args.lr)
 
-    scheduler = StepLR(optimizer, step_size=1, gamma=args.gamma)
+    print(train_loader)
 
-    for epoch in range(1, args.epochs + 1):
-        train(args, model, device, train_loader, optimizer, epoch)
-        test(model, device, test_loader)
+    gyu_data, gyu_target = [], []
+    for batch_idx, (data, target) in enumerate(train_loader):
+
+        part_data = data[np.where(target == 3)]
+        for kk in range(len(part_data)):
+            gyu_data.append(np.array(part_data[kk]))
+    gyu_data = np.array(gyu_data)
+
+    kkk = torch.utils.data.DataLoader(gyu_data, batch_size=4,
+                                              shuffle=True, num_workers=2)
+    print(kkk)
+
+
+
+
+
+
+
+
+
+
+    # model = Net().to(device)
+    # optimizer = optim.Adadelta(model.parameters(), lr=args.lr)
+
+    # scheduler = StepLR(optimizer, step_size=1, gamma=args.gamma)
+
+    # for epoch in range(1, args.epochs + 1):
+    #     train(args, model, device, train_loader, optimizer, epoch)
+    #     test(model, device, test_loader)
 
 if __name__ == "__main__":
     main()
